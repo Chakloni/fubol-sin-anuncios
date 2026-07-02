@@ -347,18 +347,29 @@
             if (urlStreaming) {
                 dashInstancia = dashjs.MediaPlayer().create();
 
-                // Forzamos a dash.js a que mantenga los parámetros del payload en cada fragmento y petición de licencia
+                // Intentamos "inyectarle" manualmente la ruta del servidor de licencias
+                // Usando la misma base de tu URL y arrastrando los tokens
+                const urlBase = urlStreaming.split('?')[0];
+                const parametros = urlStreaming.split('?')[1];
+
+                // En muchos sistemas DAI, el endpoint de la licencia Widevine se genera cambiando 'manifest.mpd' por 'license'
+                const urlLicenciaWidevine = urlBase.replace('manifest.mpd', 'license') + '?' + parametros;
+
+                const configuracionDRM = {
+                    "com.widevine.alpha": {
+                        "serverURL": urlLicenciaWidevine
+                    }
+                };
+
+                dashInstancia.setProtectionData(configuracionDRM);
+
+                // Mantenemos los parámetros estables
                 dashInstancia.updateSettings({
                     'streaming': {
-                        'buffer': {
-                            'fastSwitchEnabled': true
-                        },
-                        // Esto ayuda a mantener los query parameters (?aid=...&access_token=...) en las solicitudes secundarias
                         'matchWithExactDynamicQueryParameters': true
                     }
                 });
 
-                // Inicializamos con la URL completa
                 dashInstancia.initialize(video, urlStreaming, true);
 
                 video.play().catch(() => {
