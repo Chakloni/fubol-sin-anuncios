@@ -281,7 +281,7 @@
                     </div>
                     <div class="live-indicator">
                         <div class="live-dot"></div>
-                        INGLATERRA VS. DR CONGO
+                        ESPAÑA VS AUSTRIA
                     </div>
                 </div>
             </div>
@@ -345,13 +345,22 @@
             video.volume = 1;
 
             if (urlStreaming) {
-                // Creamos e inicializamos el reproductor dash.js
                 dashInstancia = dashjs.MediaPlayer().create();
 
-                // Vinculamos el elemento de video, pasamos la URL y configuramos el autoPlay en true
+                // Forzamos a dash.js a que mantenga los parámetros del payload en cada fragmento y petición de licencia
+                dashInstancia.updateSettings({
+                    'streaming': {
+                        'buffer': {
+                            'fastSwitchEnabled': true
+                        },
+                        // Esto ayuda a mantener los query parameters (?aid=...&access_token=...) en las solicitudes secundarias
+                        'matchWithExactDynamicQueryParameters': true
+                    }
+                });
+
+                // Inicializamos con la URL completa
                 dashInstancia.initialize(video, urlStreaming, true);
 
-                // Manejo de fallos en el autoplay debido a políticas del navegador
                 video.play().catch(() => {
                     console.log(`Autoplay bloqueado en ${idContenedor}.`);
                     mostrarInterfazYResetearTiempo();
