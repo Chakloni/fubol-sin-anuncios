@@ -351,13 +351,13 @@
                 // Usando la misma base de tu URL y arrastrando los tokens
                 const urlBase = urlStreaming.split('?')[0];
                 const parametros = urlStreaming.split('?')[1];
-
-                // En muchos sistemas DAI, el endpoint de la licencia Widevine se genera cambiando 'manifest.mpd' por 'license'
                 const urlLicenciaWidevine = urlBase.replace('manifest.mpd', 'license') + '?' + parametros;
 
                 const configuracionDRM = {
                     "com.widevine.alpha": {
-                        "serverURL": urlLicenciaWidevine
+                        "serverURL": urlLicenciaWidevine,
+                        // Le decimos al navegador que envíe las cookies y credenciales si el CDN las pide
+                        "withCredentials": true
                     }
                 };
 
